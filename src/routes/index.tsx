@@ -80,7 +80,7 @@ function NotesApp() {
       const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null") as Note[] | null;
       const list = saved && saved.length ? saved : [WELCOME];
       setNotes(list);
-      setActiveId(list[0].id);
+      setActiveId(list[0]?.id ?? "");
     } catch {
       setNotes([WELCOME]);
       setActiveId(WELCOME.id);
