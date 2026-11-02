@@ -226,6 +226,7 @@ function NotesApp() {
                   placeholder="+ tag"
                   className="w-20 bg-transparent font-mono text-xs outline-none placeholder:text-muted-foreground"
                 />
+                </div>
               </div>
               <div className="flex shrink-0 items-center gap-3">
                 <div className="flex rounded-md border bg-card p-0.5 text-xs" title="Ctrl/⌘+E">
