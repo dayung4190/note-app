@@ -226,7 +226,7 @@ function NotesApp() {
                   className="w-20 bg-transparent font-mono text-xs outline-none placeholder:text-muted-foreground"
                 />
               </div>
-                <div className="flex shrink-0 items-center gap-3">
+              <div className="flex shrink-0 items-center gap-3">
                 <div className="flex rounded-md border bg-card p-0.5 text-xs" title="Ctrl/⌘+E">
                   {(isMobile ? (["write", "read"] as Mode[]) : (["write", "split", "read"] as Mode[])).map((m) => (
                     <button key={m} onClick={() => setMode(m)} className={`rounded px-3 py-1 capitalize transition ${mode === m ? "bg-foreground text-background" : "hover:bg-muted"}`}>
@@ -235,21 +235,20 @@ function NotesApp() {
                   ))}
                 </div>
                 <button onClick={remove} className="text-xs text-muted-foreground hover:text-destructive">Delete</button>
-                </div>
               </div>
             </header>
             <div className="flex min-h-0 flex-1">
-              {mode !== "read" && (
+              {effMode !== "read" && (
                 <textarea
                   value={active.body}
                   onChange={(e) => update({ body: e.target.value, title: titleFrom(e.target.value) })}
                   spellCheck={false}
-                  className={`min-h-0 resize-none bg-card p-8 font-mono text-sm leading-7 outline-none ${mode === "split" ? "w-1/2 border-r" : "w-full"}`}
+                  className={`min-h-0 resize-none bg-card p-4 font-mono text-sm leading-7 outline-none sm:p-8 ${effMode === "split" ? "w-1/2 border-r" : "w-full"}`}
                   placeholder="Start writing markdown…"
                 />
               )}
-              {mode !== "write" && (
-                <article className={`min-h-0 overflow-y-auto px-10 py-8 ${mode === "split" ? "w-1/2" : "mx-auto w-full max-w-3xl"}`}>
+              {effMode !== "write" && (
+                <article className={`min-h-0 overflow-y-auto px-5 py-6 sm:px-10 sm:py-8 ${effMode === "split" ? "w-1/2" : "mx-auto w-full max-w-3xl"}`}>
                   <div className="prose-note">
                     <ReactMarkdown remarkPlugins={[remarkGfm]}>{active.body}</ReactMarkdown>
                   </div>
