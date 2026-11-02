@@ -141,6 +141,7 @@ function NotesApp() {
     return () => window.removeEventListener("keydown", onKey);
   });
 
+  const effMode: Mode = isMobile && mode === "split" ? "write" : mode;
   const words = active ? active.body.trim().split(/\s+/).filter(Boolean).length : 0;
 
   return (
