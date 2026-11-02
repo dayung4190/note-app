@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -73,6 +74,8 @@ function NotesApp() {
   const [mode, setMode] = useState<Mode>("split");
   const [tagInput, setTagInput] = useState("");
   const [loaded, setLoaded] = useState(false);
+  const [mobileView, setMobileView] = useState<"list" | "editor">("list");
+  const isMobile = useIsMobile();
   const searchRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
