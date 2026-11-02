@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -73,6 +74,8 @@ function NotesApp() {
   const [mode, setMode] = useState<Mode>("split");
   const [tagInput, setTagInput] = useState("");
   const [loaded, setLoaded] = useState(false);
+  const [mobileView, setMobileView] = useState<"list" | "editor">("list");
+  const isMobile = useIsMobile();
   const searchRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -107,6 +110,7 @@ function NotesApp() {
     setNotes((p) => [n, ...p]);
     setActiveId(n.id);
     setMode((m) => (m === "read" ? "split" : m));
+    setMobileView("editor");
   };
 
   const update = (patch: Partial<Note>) =>
@@ -137,11 +141,12 @@ function NotesApp() {
     return () => window.removeEventListener("keydown", onKey);
   });
 
+  const effMode: Mode = isMobile && mode === "split" ? "write" : mode;
   const words = active ? active.body.trim().split(/\s+/).filter(Boolean).length : 0;
 
   return (
     <div className="flex h-screen overflow-hidden">
-      <aside className="flex w-72 shrink-0 flex-col border-r bg-sidebar">
+      <aside className={`shrink-0 flex-col border-r bg-sidebar ${isMobile ? (mobileView === "editor" ? "hidden" : "flex w-full") : "flex w-72"}`}>
         <div className="flex items-center justify-between px-5 pt-5 pb-3">
           <h1 className="font-serif text-2xl font-semibold italic tracking-tight">Inkwell</h1>
           <button onClick={createNote} className="rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground transition hover:opacity-90" title="New note (Ctrl/⌘+N)">
@@ -174,7 +179,7 @@ function NotesApp() {
           {visible.map((n) => (
             <li key={n.id}>
               <button
-                onClick={() => setActiveId(n.id)}
+                onClick={() => { setActiveId(n.id); setMobileView("editor"); }}
                 className={`block w-full border-b border-l-4 px-5 py-3 text-left transition ${n.id === activeId ? "border-l-primary bg-card" : "border-l-transparent hover:bg-accent/50"}`}
               >
                 <div className="truncate font-serif text-base font-semibold">{n.title}</div>
@@ -192,11 +197,21 @@ function NotesApp() {
         </div>
       </aside>
 
-      <main className="flex min-w-0 flex-1 flex-col">
+      <main className={`min-w-0 flex-1 flex-col ${isMobile && mobileView === "list" ? "hidden" : "flex"}`}>
         {active ? (
           <>
-            <header className="flex flex-wrap items-center gap-3 border-b px-6 py-3">
-              <div className="flex flex-wrap items-center gap-1.5">
+            <header className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-b px-4 py-3 sm:flex sm:flex-wrap sm:px-6">
+              <div className="flex min-w-0 items-center gap-2">
+                {isMobile && (
+                  <button
+                    onClick={() => setMobileView("list")}
+                    className="shrink-0 rounded-md border bg-card px-2.5 py-1.5 text-sm transition hover:bg-accent"
+                    aria-label="Back to notes"
+                  >
+                    ←
+                  </button>
+                )}
+                <div className="flex min-w-0 flex-wrap items-center gap-1.5">
                 {active.tags.map((t) => (
                   <span key={t} className="group flex items-center gap-1 rounded-full bg-accent px-2.5 py-0.5 font-mono text-xs">
                     #{t}
@@ -211,10 +226,11 @@ function NotesApp() {
                   placeholder="+ tag"
                   className="w-20 bg-transparent font-mono text-xs outline-none placeholder:text-muted-foreground"
                 />
+                </div>
               </div>
-              <div className="ml-auto flex items-center gap-3">
+              <div className="flex shrink-0 items-center gap-3">
                 <div className="flex rounded-md border bg-card p-0.5 text-xs" title="Ctrl/⌘+E">
-                  {(["write", "split", "read"] as Mode[]).map((m) => (
+                  {(isMobile ? (["write", "read"] as Mode[]) : (["write", "split", "read"] as Mode[])).map((m) => (
                     <button key={m} onClick={() => setMode(m)} className={`rounded px-3 py-1 capitalize transition ${mode === m ? "bg-foreground text-background" : "hover:bg-muted"}`}>
                       {m}
                     </button>
@@ -224,17 +240,17 @@ function NotesApp() {
               </div>
             </header>
             <div className="flex min-h-0 flex-1">
-              {mode !== "read" && (
+              {effMode !== "read" && (
                 <textarea
                   value={active.body}
                   onChange={(e) => update({ body: e.target.value, title: titleFrom(e.target.value) })}
                   spellCheck={false}
-                  className={`min-h-0 resize-none bg-card p-8 font-mono text-sm leading-7 outline-none ${mode === "split" ? "w-1/2 border-r" : "w-full"}`}
+                  className={`min-h-0 resize-none bg-card p-4 font-mono text-sm leading-7 outline-none sm:p-8 ${effMode === "split" ? "w-1/2 border-r" : "w-full"}`}
                   placeholder="Start writing markdown…"
                 />
               )}
-              {mode !== "write" && (
-                <article className={`min-h-0 overflow-y-auto px-10 py-8 ${mode === "split" ? "w-1/2" : "mx-auto w-full max-w-3xl"}`}>
+              {effMode !== "write" && (
+                <article className={`min-h-0 overflow-y-auto px-5 py-6 sm:px-10 sm:py-8 ${effMode === "split" ? "w-1/2" : "mx-auto w-full max-w-3xl"}`}>
                   <div className="prose-note">
                     <ReactMarkdown remarkPlugins={[remarkGfm]}>{active.body}</ReactMarkdown>
                   </div>
