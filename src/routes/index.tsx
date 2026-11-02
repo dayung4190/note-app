@@ -110,6 +110,7 @@ function NotesApp() {
     setNotes((p) => [n, ...p]);
     setActiveId(n.id);
     setMode((m) => (m === "read" ? "split" : m));
+    setMobileView("editor");
   };
 
   const update = (patch: Partial<Note>) =>
@@ -144,7 +145,7 @@ function NotesApp() {
 
   return (
     <div className="flex h-screen overflow-hidden">
-      <aside className="flex w-72 shrink-0 flex-col border-r bg-sidebar">
+      <aside className={`shrink-0 flex-col border-r bg-sidebar ${isMobile ? (mobileView === "editor" ? "hidden" : "flex w-full") : "flex w-72"}`}>
         <div className="flex items-center justify-between px-5 pt-5 pb-3">
           <h1 className="font-serif text-2xl font-semibold italic tracking-tight">Inkwell</h1>
           <button onClick={createNote} className="rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground transition hover:opacity-90" title="New note (Ctrl/⌘+N)">
@@ -177,7 +178,7 @@ function NotesApp() {
           {visible.map((n) => (
             <li key={n.id}>
               <button
-                onClick={() => setActiveId(n.id)}
+                onClick={() => { setActiveId(n.id); setMobileView("editor"); }}
                 className={`block w-full border-b border-l-4 px-5 py-3 text-left transition ${n.id === activeId ? "border-l-primary bg-card" : "border-l-transparent hover:bg-accent/50"}`}
               >
                 <div className="truncate font-serif text-base font-semibold">{n.title}</div>
