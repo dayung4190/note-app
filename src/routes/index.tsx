@@ -196,11 +196,21 @@ function NotesApp() {
         </div>
       </aside>
 
-      <main className="flex min-w-0 flex-1 flex-col">
+      <main className={`min-w-0 flex-1 flex-col ${isMobile && mobileView === "list" ? "hidden" : "flex"}`}>
         {active ? (
           <>
-            <header className="flex flex-wrap items-center gap-3 border-b px-6 py-3">
-              <div className="flex flex-wrap items-center gap-1.5">
+            <header className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-b px-4 py-3 sm:flex sm:flex-wrap sm:px-6">
+              <div className="flex min-w-0 items-center gap-2">
+                {isMobile && (
+                  <button
+                    onClick={() => setMobileView("list")}
+                    className="shrink-0 rounded-md border bg-card px-2.5 py-1.5 text-sm transition hover:bg-accent"
+                    aria-label="Back to notes"
+                  >
+                    ←
+                  </button>
+                )}
+                <div className="flex min-w-0 flex-wrap items-center gap-1.5">
                 {active.tags.map((t) => (
                   <span key={t} className="group flex items-center gap-1 rounded-full bg-accent px-2.5 py-0.5 font-mono text-xs">
                     #{t}
@@ -216,15 +226,16 @@ function NotesApp() {
                   className="w-20 bg-transparent font-mono text-xs outline-none placeholder:text-muted-foreground"
                 />
               </div>
-              <div className="ml-auto flex items-center gap-3">
+                <div className="flex shrink-0 items-center gap-3">
                 <div className="flex rounded-md border bg-card p-0.5 text-xs" title="Ctrl/⌘+E">
-                  {(["write", "split", "read"] as Mode[]).map((m) => (
+                  {(isMobile ? (["write", "read"] as Mode[]) : (["write", "split", "read"] as Mode[])).map((m) => (
                     <button key={m} onClick={() => setMode(m)} className={`rounded px-3 py-1 capitalize transition ${mode === m ? "bg-foreground text-background" : "hover:bg-muted"}`}>
                       {m}
                     </button>
                   ))}
                 </div>
                 <button onClick={remove} className="text-xs text-muted-foreground hover:text-destructive">Delete</button>
+                </div>
               </div>
             </header>
             <div className="flex min-h-0 flex-1">
